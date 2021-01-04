@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhn.cartransaction.mapper.DealServiceMapper">
+
+
+    <insert id="insertRecord" >
+        INSERT INTO dealinfo (ownerId, cusId, dealPrice, dealTime, carId)
+        VALUES (#{ownerId}, #{cusId}, #{dealPrice}, #{dealTime}, #{carId})
+    </insert>
+
+    <select id="queryDealInfo" resultType="DealDetailInfo">
+        SELECT dealinfo.*, ownerinfo.userName AS ownerName, cusinfo.userName AS cusName, carinfo.carBrand, carinfo.carStyle
+        FROM dealinfo, userinfo AS ownerinfo, userinfo AS cusinfo, carinfo
+        WHERE dealinfo.ownerId = ownerinfo.userId
+        AND dealinfo.cusId = cusinfo.userId
+        AND dealinfo.carId = carinfo.carId;
+    </select>
+
+
+
+</mapper>

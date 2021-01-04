@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<script src="https://how2j.cn/study/js/jquery/2.0.0/jquery.min.js"></script>
+<link href="https://how2j.cn/study/css/bootstrap/3.3.6/bootstrap.min.css" rel="stylesheet">
+<script src="https://how2j.cn/study/js/bootstrap/3.3.6/bootstrap.min.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息</title>
+    <script type="text/javascript">
+        function getUserInfo() {
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            //alert("133");
+            xmlhttp.open("get", "http://localhost:8080/queryUserInfo", true);
+            xmlhttp.withCredentials = true;
+            xmlhttp.onreadystatechange = function() {
+
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+                    result = xmlhttp.responseText;
+                    if(result == "") {
+                        alert("请先登录");
+                        window.location.href = "Login.html";
+                        return ;
+                    }
+                    json = eval("(" + result + ")");
+
+                    document.getElementById("userName").innerHTML = json.userName;
+                    document.getElementById("userId").innerHTML = json.userId;
+                    document.getElementById("money").innerHTML = json.money;
+                    document.getElementById("phoneNum").innerHTML = json.phoneNum;
+                    getCarInfo();
+
+                }
+            }
+
+            xmlhttp.send();
+        }
+
+        function toSellCar() {
+            window.location.href = "SellCar.html";
+        }
+
+        function toEditInfo() {
+
+            window.location.href = "EditInfo.html?userId=" + document.getElementById("userId").innerHTML;
+        }
+
+        function toQueryCar() {
+            window.location.href = "QueryCar.html";
+        }
+
+        function toRecharge() {
+            window.location.href = "Recharge.html";
+        }
+
+        function getCarInfo() {
+            var userId = document.getElementById("userId").innerHTML;
+            if(window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            xmlhttp.open("get", "http://localhost:8080/carDetailInfoByUser?userId=" + userId, true);
+
+            xmlhttp.onreadystatechange = function ()
+            {
+                if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    result = xmlhttp.responseText;
+                    //alert(result);
+                    if (result == null || result == "") {
+                        alert("出现错误！");
+                        return ;
+                    }
+                    json = eval("(" + result + ")");
+                    document.getElementById("carInfo").innerHTML = printInfos(json);
+                    getBuyCarInfo();
+                }
+            }
+            xmlhttp.send();
+        }
+
+        function printInfos(json) {
+            if (json.length == 0) return "您暂无已上架的汽车";
+            content = "<div>您已上架的汽车</div>";
+            content += "<table border='1' cellspacing=\"0\">";
+            content += "<tr><th>序号</th>" +
+                "<th>品牌</th><th>车系</th><th>价格</th>" +
+                "<th>车型</th><th>里程</th>" +
+                "<th>颜色</th><th>操作</th>" +
+                "</tr>";
+            k = 0;
+
+            for(i = 0; i < json.length; i++) {
+                content += "<tr><td>" + ++k + "</td>";
+                content += "<td>" + json[i].carBrand + "</td>";
+                content += "<td>" + json[i].carStyle + "</td>";
+                content += "<td>" + json[i].carPrice + "万元</td>";
+                content += "<td>" + json[i].carType + "</td>";
+                content += "<td>" + json[i].carMileage + "万公里</td>";
+                content += "<td>" + json[i].carColor + "</td>";
+
+
+                if (json[i].auctionPrice != 0) {
+                    content += "<td>当前竞价：" + json[i].auctionPrice + "元 <button class=\"btn btn-default\" onclick='deal(\"" + json[i].carId + "\")'>成交</button></td>";
+                } else {
+                    content += "<td><button class=\"btn btn-default\" onclick='toAuction(\"" + json[i].carId + "\")'>发起竞拍</button></td></tr>";
+                }
+
+            }
+            content += "</table>";
+            return content;
+        }
+
+        function deal(carId) {
+
+            if(window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            xmlhttp.open("get", "http://localhost:8080/makeDeal?carId=" + carId, true);
+
+            xmlhttp.onreadystatechange = function ()
+            {
+                if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    result = xmlhttp.responseText;
+
+                    if (result == null || result == "" || result == "false") {
+                        alert("交易失败！");
+                        return ;
+                    }
+                    alert("交易成功！");
+                    getUserInfo();
+
+                }
+            }
+            xmlhttp.send();
+        }
+
+        function toAuction(carId) {
+            window.location.href = "SetAuctionPrice.html?carId=" + carId;
+        }
+
+        function getBuyCarInfo() {
+            //var userId = document.getElementById("userId").innerHTML;
+            if(window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            xmlhttp.open("get", "http://localhost:8080/queryBuyCar", true);
+
+            xmlhttp.onreadystatechange = function ()
+            {
+                if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    result = xmlhttp.responseText;
+                    //alert(result);
+                    if (result == null || result == "") {
+
+                        return ;
+                    }
+                    json = eval("(" + result + ")");
+                    document.getElementById("buyCarInfo").innerHTML = printInfos2(json);
+
+                }
+            }
+            xmlhttp.send();
+        }
+
+        function printInfos2(json) {
+            if (json.length == 0) return "您暂无已拍下的汽车";
+            content = "<div>您已拍下的汽车</div>";
+            content += "<table border='1' cellspacing=\"0\">";
+            content += "<tr><th>序号</th>" +
+                "<th>品牌</th><th>车系</th><th>价格</th>" +
+                "<th>车型</th><th>里程</th>" +
+                "<th>颜色</th>" +
+                "</tr>";
+            k = 0;
+
+            for(i = 0; i < json.length; i++) {
+                content += "<tr><td>" + ++k + "</td>";
+                content += "<td>" + json[i].carBrand + "</td>";
+                content += "<td>" + json[i].carStyle + "</td>";
+                content += "<td>" + json[i].carPrice + "万元</td>";
+                content += "<td>" + json[i].carType + "</td>";
+                content += "<td>" + json[i].carMileage + "万公里</td>";
+                content += "<td>" + json[i].carColor + "</td></tr>";
+
+            }
+            content += "</table>";
+            return content;
+        }
+
+    </script>
+</head>
+<body onload="getUserInfo()">
+<div align='center'>
+    <h2> →二手车直卖网← </h2>
+    <h4> 严选好车，值得信赖 </h4>
+    <h4> 您好，<label id="userName"></label> </h4>
+    <table border="0">
+        <tr><td>您的个人信息</td></tr>
+        <tr><td> ID：<label id="userId"></label> </td></tr>
+        <tr><td> 您的余额：<label id="money"></label>元 <button class="btn btn-default" onclick="toRecharge()">充值</button></td></tr>
+        <tr><td> 绑定手机：<label id="phoneNum"></label> </td></tr>
+        <tr><td><button class="btn btn-default" onclick="toEditInfo()">修改个人信息</button></td></tr>
+        <tr> </tr>
+
+    </table>
+    <table>
+        <tr><td><button class="btn btn-default" onclick="toQueryCar()">二手车信息查询</button></td>
+            <td><button class="btn btn-default" onclick="toSellCar()">我要卖车</button></td></tr>
+        <tr><td>  </td></tr>
+    </table>
+    <br>
+
+    <div id="carInfo"></div><br>
+    <div id="buyCarInfo"></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhn.cartransaction.mapper.UserServiceMapper">
+
+    <insert id="addUser">
+        INSERT INTO userinfo (userId, userName, phoneNum, money, pwd)
+        VALUES (#{userId}, #{userName}, #{phoneNum}, #{money}, #{pwd})
+    </insert>
+
+    <select id="getMaxUid" resultType="java.lang.String">
+        SELECT max(userId) FROM userinfo
+    </select>
+
+    <select id="getUser" resultType="UserInfo">
+        SELECT userinfo.* FROM userinfo WHERE userinfo.userId = #{userId}
+    </select>
+
+    <insert id="addCar">
+        INSERT INTO carinfo (carId, carBrand, carStyle, carPrice, carAge, carGearbox, carType, carMileage,
+        carDisplacement, carSeatNum, carFuelType, carColor, carDriveType, flag)
+        VALUES (#{carId}, #{carBrand}, #{carStyle}, #{carPrice}, #{carAge}, #{carGearbox}, #{carType}, #{carMileage},
+        #{carDisplacement}, #{carSeatNum}, #{carFuelType}, #{carColor}, #{carDriveType}, '1')
+    </insert>
+
+    <insert id="addCheckInfo">
+        INSERT INTO checkinfo (carId, carOrigin, accidentNum, inspection, userId)
+        VALUES (#{carId}, #{carOrigin}, #{accidentNum}, #{inspection}, #{userId})
+    </insert>
+
+    <update id="updateUserInfo">
+        UPDATE userinfo
+        SET userinfo.userName = #{userName}, userinfo.phoneNum = #{phoneNum}, userinfo.pwd = #{pwd}
+        WHERE userinfo.userId = #{userId}
+    </update>
+
+    <update id="recharge">
+        UPDATE userinfo
+        SET userinfo.money = userinfo.money + #{addMoney}
+        WHERE userinfo.userId = #{userId}
+    </update>
+
+    <select id="getMoney" resultType="java.lang.Double">
+        SELECT userinfo.money FROM userinfo WHERE userinfo.userId = #{userId}
+    </select>
+
+    <update id="dealGetMoney" >
+        UPDATE userinfo
+        SET userinfo.money = userinfo.money + #{money}
+        WHERE userinfo.userId = #{userId}
+    </update>
+
+    <update id="dealGiveMoney" >
+        UPDATE userinfo
+        SET userinfo.money = userinfo.money - #{money}
+        WHERE userinfo.userId = #{userId}
+    </update>
+
+    <select id="queryBuyCar" resultType="CarInfo">
+        SELECT * FROM carinfo
+        WHERE carinfo.carId IN
+        (SELECT carId FROM dealinfo WHERE dealinfo.cusId = #{userId});
+    </select>
+
+
+</mapper>

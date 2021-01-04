@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<script src="https://how2j.cn/study/js/jquery/2.0.0/jquery.min.js"></script>
+<link href="https://how2j.cn/study/css/bootstrap/3.3.6/bootstrap.min.css" rel="stylesheet">
+<script src="https://how2j.cn/study/js/bootstrap/3.3.6/bootstrap.min.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我要卖车</title>
+    <script type="text/javascript">
+        function addCar() {
+            if(window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            carBrand = document.getElementById("carBrand").value;
+            carStyle = document.getElementById("carStyle").value;
+            carPrice = document.getElementById("carPrice").value;
+            carAge = document.getElementById("carAge").value;
+            carGearbox = getGearbox();
+            carType = getType();
+            carMileage = getMileage();
+            carDisplacement = document.getElementById("carDisplacement").value;
+            carSeatNum = document.getElementById("carSeatNum").value;
+            carFuelType = getFuelType();
+            carColor = document.getElementById("carColor").value;
+            carDriveType = getDrive();
+
+            carOrigin = document.getElementById("carOrigin").value;
+            accidentNum = document.getElementById("accidentNum").value;
+            inspection = getInspection();
+
+
+            if(carBrand == "" || carStyle == "" || carPrice == "" || carAge == ""
+            || carGearbox == "" || carType == "" || carMileage == "" || carDisplacement == "" || carSeatNum == ""
+            || carFuelType == "" || carColor == "" || carDriveType == ""
+                || carOrigin == "" || accidentNum == "" || inspection == "") {
+                alert("车辆信息未填写完整");
+                return ;
+            }
+
+            xmlhttp.open("post", "http://localhost:8080/sellCar", true);
+
+            xmlhttp.onreadystatechange = function() {
+                if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    result = xmlhttp.responseText;
+                    if (result == "true") {
+                        alert("提交成功！");
+                        window.location.href = "UserInfo.html";
+                    } else {
+                        alert("出现错误！");
+                        return ;
+                    }
+
+
+                }
+            }
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.send("carBrand=" + carBrand
+                + "&carStyle=" + carStyle
+                + "&carPrice=" + carPrice
+                + "&carAge=" + carAge
+                + "&carGearbox=" + carGearbox
+                + "&carType=" + carType
+                + "&carMileage=" + carMileage
+                + "&carDisplacement=" + carDisplacement
+                + "&carSeatNum=" + carSeatNum
+                + "&carFuelType=" + carFuelType
+                + "&carColor=" + carColor
+                + "&carDriveType=" + carDriveType
+                + "&carOrigin=" + carOrigin
+                + "&accidentNum=" +accidentNum
+                + "&inspection=" + inspection);
+        }
+        //选择变速箱
+        function getGearbox()
+        {
+            choose = document.getElementsByName("carGearbox");
+            for(i = 0; i < choose.length; i++) {
+                if(choose[i].checked) {
+                    return choose[i].value;
+                }
+            }
+        }
+        //选择燃油类型
+        function getFuelType()
+        {
+            choose = document.getElementsByName("carFuelType");
+            for(i = 0; i < choose.length; i++) {
+                if(choose[i].checked) {
+                    return choose[i].value;
+                }
+            }
+        }
+        //选择驱动
+        function getDrive()
+        {
+            choose = document.getElementsByName("carDriveType");
+            for(i = 0; i < choose.length; i++) {
+                if(choose[i].checked) {
+                    return choose[i].value;
+                }
+            }
+        }
+
+        //车型选择
+        function printType() {
+            content = "<select id='type'>";
+            content += "<option value='三厢轿车'>三厢轿车</option>";
+            content += "<option value='SUV'>SUV</option>";
+            content += "<option value='跑车'>跑车</option>";
+            content += "</select> ";
+            document.getElementById("typeSelect").innerHTML = content;
+
+        }
+        function getType() {
+            var obj = document.getElementById("type");
+            var index = obj.selectedIndex; // 选中索引
+            var text = obj.options[index].text; // 选中文本
+            var value = obj.options[index].value;
+            //alert(value);
+            return value;
+        }
+
+        //里程选择框
+        function printMileage() {
+            content = "<select id='mileage'>";
+            for(i = 0; i < 5; i++) {
+                content += "<option value='" + (i*2+2) + "'>" + (i*2+2) + "万公里以内</option>";
+            }
+            content += "</select> ";
+            document.getElementById("mileageSelect").innerHTML = content;
+        }
+        function getMileage() {
+            var obj = document.getElementById("mileage");
+            var index = obj.selectedIndex; // 选中索引
+            var text = obj.options[index].text; // 选中文本
+            var value = obj.options[index].value;
+            //alert(value);
+            return value;
+        }
+        //-----------------------------------------
+
+        //年审情况选择
+        function printInspection() {
+            content = "<select id='inspection'>";
+            content += "<option value='合格'>合格</option>";
+            content += "<option value='不合格'>不合格</option>";
+            content += "<option value='未年审'>未年审</option>";
+            content += "</select> ";
+            document.getElementById("inspectionSelect").innerHTML = content;
+
+        }
+        function getInspection() {
+            var obj = document.getElementById("inspection");
+            var index = obj.selectedIndex; // 选中索引
+            var text = obj.options[index].text; // 选中文本
+            var value = obj.options[index].value;
+            //alert(value);
+            return value;
+        }
+
+
+
+        function printHTML() {
+            printType();
+            printMileage();
+            printInspection()
+
+        }
+
+        function goBack() {
+            window.location.href = "UserInfo.html";
+        }
+    </script>
+</head>
+
+<body onload="printHTML()">
+<div align="center">
+    <h2>我要卖车</h2>
+    <table border="0">
+        <tr><td>品牌：<input type="text" id="carBrand"/></td></tr>
+        <tr><td>车系：<input type="text" id="carStyle"/></td></tr>
+        <tr><td>售价：<input type="text" id="carPrice"/>万</td></tr>
+        <tr><td>车龄：<input type="text" id="carAge"/>年</td></tr>
+
+        <tr><td>变速箱:
+            <input type="radio" name="carGearbox" value="自动">自动
+            <input type="radio" name="carGearbox" value="手动">手动</td></tr>
+
+        <tr><td>车型： <label id="typeSelect"></label> </td></tr>
+        <tr><td>里程： <label id="mileageSelect"></label> </td></tr>
+
+        <tr><td>排量：<input type="text" id="carDisplacement"/>L</td></tr>
+
+        <tr><td>座位数：<input type="text" id="carSeatNum"/></td></tr>
+
+        <tr><td>燃油类型:
+            <input type="radio" name="carFuelType" value="汽油">汽油
+            <input type="radio" name="carFuelType" value="柴油">柴油</td></tr>
+
+        <tr><td>颜色：<input type="text" id="carColor"/></td></tr>
+
+        <tr><td>驱动:
+            <input type="radio" name="carDriveType" value="两驱">两驱
+            <input type="radio" name="carDriveType" value="四驱">四驱</td></tr>
+
+        <tr><td>汽车来源：<input type="text" id="carOrigin"/></td></tr>
+        <tr><td>交通事故次数：<input type="text" id="accidentNum"/></td></tr>
+
+        <tr><td>年审情况： <label id="inspectionSelect"></label> </td></tr>
+
+    </table>
+    <table>
+        <tr>
+            <td><button class="btn btn-default" onclick="addCar()">提交出售</button>
+            <button class="btn btn-default" onclick="goBack()">取消</button></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

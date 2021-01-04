@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<script src="https://how2j.cn/study/js/jquery/2.0.0/jquery.min.js"></script>
+<link href="https://how2j.cn/study/css/bootstrap/3.3.6/bootstrap.min.css" rel="stylesheet">
+<script src="https://how2j.cn/study/js/bootstrap/3.3.6/bootstrap.min.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>车辆审核</title>
+    <script type="text/javascript">
+        function getAdminId() {
+
+            document.getElementById("adminId").innerHTML = "管理员 " + window.location.href.split("=")[1] + " ，您好";
+        }
+        function queryDetailInfo() {
+
+            if(window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open("get", "http://localhost:8080/allCarDetailInfoAdmin", true);
+            xmlhttp.onreadystatechange = function()
+            {
+
+                if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+                    result = xmlhttp.responseText;
+                    if (result == null || result == "") {
+                        alert("管理员请先登录！");
+                        window.location.href = "AdminLogin.html";
+                        return ;
+                    }
+                    json = eval("(" + result + ")");
+                    document.getElementById("carInfos").innerHTML = printInfos(json);
+                    getAdminId();
+                }
+            }
+
+            xmlhttp.send();
+        }
+        function printInfos(json) {
+
+            content = "<table border='1'>";
+            content += "<tr><th>序号</th>" + "<th>品牌</th><th>车系</th><th>价格</th><th>颜色</th>" +
+                "<th>车辆来源</th><th>事故次数</th><th>年审情况</th><th>上架用户</th><th>操作</th></tr>";
+            k = 0;
+            for(i = 0; i < json.length; i++) {
+
+
+                content += "<tr><td>" + ++k + "</td>";
+                content += "<td>" + json[i].carBrand + "</td>";
+                content += "<td>" + json[i].carStyle + "</td>";
+                content += "<td>" + json[i].carPrice + "万元</td>";
+                content += "<td>" + json[i].carColor + "</td>";
+                content += "<td>" + json[i].carOrigin + "</td>";
+                content += "<td>" + json[i].accidentNum + "</td>";
+                content += "<td>" + json[i].inspection + "</td>";
+                content += "<td>" + json[i].userName + "</td>";
+
+                content += "<td><button class=\"btn btn-default\" onclick='deleteCar(\"" + json[i].carId + "\")'>下架</button></td>";
+                //content += "<td><button class=\"btn btn-default\" onclick='toEditCar(\"" + json[i].carId + "\")'>修改</button></td>";
+                content += "</tr>";
+
+
+            }
+            content += "</table>";
+            return content;
+        }
+
+        function deleteCar(carId) {
+            if(!confirm("确定要下架车辆 " + carId + " 的信息吗？")) return ;
+            if(window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open("get", "http://localhost:8080/deleteCar?carId=" + carId, true);
+            xmlhttp.onreadystatechange = function()
+            {
+                if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    result = xmlhttp.responseText;
+                    if(result == "true") {
+                        alert("车辆 " + carId + " 信息已被移除！");
+                        queryDetailInfo();
+                    } else {
+                        alert(" 操作失败！管理员请先登录");
+                    }
+                }
+            }
+            xmlhttp.send();
+        }
+
+        /*
+        function toEditCar(carId) {
+            window.location.href = "EditCar.html?carId=" + carId;
+        }*/
+
+        function goBack() {
+            var adminId = window.location.href.split("=")[1];
+            window.location.href = "AdminView.html?adminId=" + adminId;
+        }
+
+    </script>
+</head>
+<body onload="queryDetailInfo()">
+
+
+<div align="center">
+
+    <h3>车辆审核</h3>
+    <label id="adminId"></label>
+    <div id="carInfos"></div>
+    <div><button class="btn btn-default" onclick='goBack()'>返回</button></div>
+
+</div>
+
+</body>
+</html>

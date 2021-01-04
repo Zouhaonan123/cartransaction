@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhn.cartransaction.mapper.CarServiceMapper">
+
+    <select id="queryCar" resultType="CarInfo">
+        SELECT carinfo.* FROM carinfo
+        WHERE carinfo.carBrand LIKE #{carBrand}
+        AND carinfo.carGearbox LIKE #{carGearbox}
+        AND carinfo.carType LIKE #{carType}
+        AND carinfo.carFuelType LIKE #{carFuelType}
+        AND carinfo.carColor LIKE #{carColor}
+        AND carinfo.carDriveType LIKE #{carDriveType}
+        AND ( carinfo.carPrice >= #{carPriceLow} AND carinfo.carPrice &lt;= #{carPriceHigh} )
+        AND ( carinfo.carAge &lt;= #{carAgeHigh} )
+        AND ( carinfo.carMileage &lt;= #{carMileageHigh} )
+        AND ( carinfo.carDisplacement >= #{carDisplacementLow} AND carinfo.carDisplacement &lt;= #{carDisplacementHigh} )
+        AND ( carinfo.flag = 1 )
+    </select>
+
+    <select id="queryBrand" resultType="java.lang.String">
+        SELECT DISTINCT (carBrand) FROM carinfo WHERE carinfo.flag = 1;
+    </select>
+
+    <select id="getMaxCid" resultType="java.lang.String">
+        SELECT max(carId) FROM carinfo
+    </select>
+
+    <select id="queryDetailInfo" resultType="CarDetailInfo">
+        SELECT carinfo.*, checkinfo.carOrigin, checkinfo.accidentNum, checkinfo.inspection, checkinfo.userId, userinfo.userName, userinfo.phoneNum
+        FROM carinfo, checkinfo, userinfo
+        WHERE carinfo.carId = checkinfo.carId AND checkinfo.userId = userinfo.userid AND carinfo.carId = #{carId}
+    </select>
+
+    <select id="queryAllCarDetailInfo" resultType="CarDetailInfo">
+        SELECT carinfo.*, checkinfo.carOrigin, checkinfo.accidentNum, checkinfo.inspection, checkinfo.userId, userinfo.userName, userinfo.phoneNum
+        FROM carinfo, checkinfo, userinfo
+        WHERE carinfo.carId = checkinfo.carId AND checkinfo.userId = userinfo.userid
+    </select>
+
+    <select id="queryCarDetailInfoByUser" resultType="CarDetailInfo">
+        SELECT carinfo.*, checkinfo.carOrigin, checkinfo.accidentNum, checkinfo.inspection, checkinfo.userId, userinfo.userName, userinfo.phoneNum
+        FROM carinfo, checkinfo, userinfo
+        WHERE carinfo.carId = checkinfo.carId AND checkinfo.userId = userinfo.userid AND userinfo.userId = #{userId}
+    </select>
+
+    <update id="updateCarFlag">
+        UPDATE carinfo SET carinfo.flag = '0' WHERE carinfo.carId = #{carId}
+    </update>
+
+    <delete id="deleteCar">
+        DELETE FROM carinfo WHERE carinfo.carId = #{carId}
+    </delete>
+
+    <delete id="deleteCheck">
+        DELETE FROM checkinfo WHERE checkinfo.carId = #{carId}
+    </delete>
+
+</mapper>

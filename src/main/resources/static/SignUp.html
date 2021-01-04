@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<script src="https://how2j.cn/study/js/jquery/2.0.0/jquery.min.js"></script>
+<link href="https://how2j.cn/study/css/bootstrap/3.3.6/bootstrap.min.css" rel="stylesheet">
+<script src="https://how2j.cn/study/js/bootstrap/3.3.6/bootstrap.min.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+    <script type="text/javascript">
+
+        function signUp() {
+            if(window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            userName = document.getElementById("userName").value;
+            phoneNum = document.getElementById("phoneNum").value;
+            money = document.getElementById("money").value;
+            pwd = document.getElementById("pwd").value;
+
+            if(userName == "" || phoneNum == "" || money == "" || pwd == "") {
+                alert("基本信息未填写完整");
+                return ;
+            }
+
+            xmlhttp.open("post", "http://localhost:8080/signUp", true);
+
+            xmlhttp.onreadystatechange = function() {
+                if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    result = xmlhttp.responseText;
+
+                    alert("注册成功！\n您的账号：" + result);
+                    window.location.href = "Login.html";
+
+                }
+            }
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.send("userName=" + userName + "&phoneNum=" + phoneNum + "&money=" + money + "&pwd=" + pwd);
+        }
+    </script>
+</head>
+<body>
+<div align="center">
+    <h2>新用户注册</h2>
+    <table border="0">
+        <tr><td>用户名:</td><td><input type="text" id="userName"/></td></tr>
+        <tr><td>手机号码:</td><td><input type="text" id="phoneNum"/></td></tr>
+        <tr><td>存款：</td><td><input type="text" id="money"/></td></tr>
+
+        <tr><td>密码：</td><td><input type="text" id="pwd"/></td></tr>
+
+    </table>
+    <div><button class="btn btn-default" onclick="signUp()">注册</button><br></div>
+</div>
+
+</body>
+</html>
